@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const { Article, Comment, Topic, User } = require('../models');
-const { generateRefs, formatArticles, generateSlugs } = require('../utils');
+const {
+  generateRefs,
+  formatArticles,
+  generateSlugs,
+  formatComments,
+  generateArticleRefs
+} = require('../utils');
 
 const seedDB = ({ articles, comments, topics, users }) => {
   return mongoose.connection
@@ -12,14 +18,36 @@ const seedDB = ({ articles, comments, topics, users }) => {
       // Formatting articles
       const userRefs = generateRefs(users, userDocs);
       const slugRefs = generateSlugs(topics);
-      console.log(slugRefs);
       const formattedArticles = formatArticles({
         articles,
         userRefs,
         topics,
         slugRefs
       });
-      console.log(formattedArticles);
+      return Promise.all([
+        topicDocs,
+        userDocs,
+        Article.insertMany(formattedArticles),
+        userRefs
+      ]);
+    })
+    .then(([topicDocs, userDocs, articleDocs, userRefs]) => {
+      // Formatting comments
+      const articleRefs = generateArticleRefs(articles, articleDocs);
+      const formattedComments = formatComments({
+        comments,
+        userRefs,
+        articleRefs
+      });
+      return Promise.all([
+        topicDocs,
+        userDocs,
+        articleDocs,
+        Comment.insertMany(formattedComments)
+      ]);
+    })
+    .then(([topicDocs, userDocs, articleDocs, commentDocs]) => {
+      console.log(articleDocs);
     })
     .catch(console.log);
 };
