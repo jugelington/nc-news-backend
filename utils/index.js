@@ -15,13 +15,7 @@ exports.generateSlugs = topics => {
 exports.formatArticles = ({ articles, userRefs, topics, slugRefs }) => {
   return articles.map(article => ({
     ...article,
-    created_by: article.created_by // There *must* be a more efficient way of doing this!
-      .split(' ')
-      .map(creator => userRefs[creator])
-      .join(''),
-    belongs_to: article.topic
-      .split(' ')
-      .map(topic => slugRefs[topic])
-      .join('')
+    created_by: userRefs[article.created_by],
+    belongs_to: slugRefs[article.topic]
   }));
 };
