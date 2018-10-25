@@ -3,10 +3,22 @@ const { formatComment } = require('../utils');
 
 exports.getAllArticles = (req, res, next) => {
   Article.find()
+    .lean()
     .populate('created_by')
     .then(articles => {
-      res.send({ articles });
+      return Promise.all(
+        articles.map(article => {
+          return Comment.countDocuments({
+            belongs_to: article._id
+          }).then(comment_count => {
+            article.comment_count = comment_count;
+            console.log(article);
+            return article;
+          });
+        })
+      ).then(formatted => res.send(formatted));
     })
+
     .catch(next);
 };
 
@@ -15,7 +27,14 @@ exports.getArticleById = (req, res, next) => {
   Article.findById(article_id)
     .populate('created_by')
     .then(article => {
-      res.send({ article });
+      return Promise.all([
+        article,
+        Comment.countDocuments({ belongs_to: article_id })
+      ]);
+    })
+    .then(([article, comment_count]) => {
+      article._doc.comment_count = comment_count;
+      res.send(article);
     })
     .catch(next);
 };
