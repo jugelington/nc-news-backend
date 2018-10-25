@@ -35,3 +35,11 @@ exports.formatComments = ({ comments, userRefs, articleRefs }) => {
     belongs_to: articleRefs[comment.belongs_to]
   }));
 };
+
+exports.formatComment = (body, article_id) => {
+  const postedAt = new Date();
+  body.belongs_to = article_id;
+  body.votes = 0;
+  body.created_at = postedAt.toISOString();
+  return body;
+};

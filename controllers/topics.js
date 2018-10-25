@@ -1,5 +1,4 @@
-const { Article, Comment, Topic, User } = require('../models');
-const mongoose = require('mongoose');
+const { Article, Topic } = require('../models');
 
 exports.getAllTopics = (req, res, next) => {
   Topic.find()
@@ -14,7 +13,7 @@ exports.getArticlesByTopic = (req, res, next) => {
     .then(articles => {
       res.send(articles);
     })
-    .catch(console.log);
+    .catch(next);
 };
 
 exports.postArticle = (req, res, next) => {
@@ -24,5 +23,5 @@ exports.postArticle = (req, res, next) => {
     .then(() => {
       res.status(201).send({ newArticle });
     })
-    .catch(console.log);
+    .catch(next);
 };
