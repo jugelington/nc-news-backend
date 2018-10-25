@@ -21,4 +21,17 @@ mongoose
 
 app.use('/api', apiRouter);
 
+app.use('/*', (req, res) => {
+  res.status(404).send({ msg: '404 page not found' });
+});
+
+app.use((err, req, res, next) => {
+  if (err.name === 'CastError' || err.status === 404) {
+    return res.status(404).send({ msg: 'ID not found' });
+  }
+});
+
+app.use((err, req, res, next) => {
+  return res.status(500).send({ message: 'Unknown Error!' });
+});
 module.exports = app;

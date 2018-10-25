@@ -6,7 +6,7 @@ exports.patchCommentVotes = (req, res, next) => {
   if (vote === 'up') {
     Comment.findByIdAndUpdate(comment_id, { $inc: { votes: 1 } })
       .then(() => {
-        res.send({
+        res.status(201).send({
           msg: 'Upvote!'
         });
       })
@@ -14,13 +14,16 @@ exports.patchCommentVotes = (req, res, next) => {
   } else if (vote === 'down') {
     Comment.findByIdAndUpdate(comment_id, { $inc: { votes: -1 } })
       .then(() => {
-        res.send({
+        res.status(201).send({
           msg: 'Downvote!'
         });
       })
       .catch(next);
   } else {
-    res.send({ msg: 'Votes must be "up" or "down"!' }).catch(next);
+    res
+      .status(400)
+      .send({ msg: 'Votes must be "up" or "down"!' })
+      .catch(next);
   }
 };
 
@@ -28,7 +31,7 @@ exports.deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
   Comment.findByIdAndRemove(comment_id)
     .then(() => {
-      res.send({ msg: 'comment deleted!' });
+      res.status(200).send({ msg: 'comment deleted!' });
     })
     .catch(next);
 };

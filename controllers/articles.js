@@ -12,7 +12,6 @@ exports.getAllArticles = (req, res, next) => {
             belongs_to: article._id
           }).then(comment_count => {
             article.comment_count = comment_count;
-            console.log(article);
             return article;
           });
         })
@@ -27,10 +26,14 @@ exports.getArticleById = (req, res, next) => {
   Article.findById(article_id)
     .populate('created_by')
     .then(article => {
-      return Promise.all([
-        article,
-        Comment.countDocuments({ belongs_to: article_id })
-      ]);
+      if (!article) {
+        return Promise.reject({ status: 404 });
+      } else {
+        return Promise.all([
+          article,
+          Comment.countDocuments({ belongs_to: article_id })
+        ]);
+      }
     })
     .then(([article, comment_count]) => {
       article._doc.comment_count = comment_count;
@@ -65,18 +68,22 @@ exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
   const { vote } = req.query;
   if (vote === 'up') {
-    Article.findByIdAndUpdate(article_id, { $inc: { votes: 1 } }).then(() => {
-      res.send({
-        msg: 'Upvote!'
-      });
-    });
+    Article.findByIdAndUpdate(article_id, { $inc: { votes: 1 } })
+      .then(article => {
+        res.status(201).send({
+          msg: 'Upvote!'
+        });
+      })
+      .catch(next);
   } else if (vote === 'down') {
-    Article.findByIdAndUpdate(article_id, { $inc: { votes: -1 } }).then(() => {
-      res.send({
-        msg: 'Downvote!'
-      });
-    });
+    Article.findByIdAndUpdate(article_id, { $inc: { votes: -1 } })
+      .then(article => {
+        res.status(201).send({
+          msg: 'Downvote!'
+        });
+      })
+      .catch(next);
   } else {
-    res.send({ msg: 'Votes must be "up" or "down"!' });
+    res.status(400).send({ msg: 'Votes must be "up" or "down"!' });
   }
 };
