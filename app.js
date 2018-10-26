@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { DB_URL } = process.env.MONGODB_URI || require('./config');
+const DB_URL = process.env.MONGODB_URI;
 const express = require('express');
 const app = express();
 
