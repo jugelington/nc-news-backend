@@ -56,20 +56,14 @@ exports.postComment = (req, res, next) => {
 exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
   const { vote } = req.query;
-  if (vote === 'up') {
-    Article.findOneAndUpdate({ _id: article_id }, { $inc: { votes: 1 } })
+
+  if (vote === 'up' || vote === 'down') {
+    Article.findOneAndUpdate(
+      { _id: article_id },
+      { $inc: { votes: vote === 'up' ? 1 : -1 } }
+    )
       .then(article => {
-        res.status(201).send({
-          msg: 'Upvote!'
-        });
-      })
-      .catch(next);
-  } else if (vote === 'down') {
-    Article.findOneAndUpdate({ _id: article_id }, { $inc: { votes: -1 } })
-      .then(article => {
-        res.status(201).send({
-          msg: 'Downvote!'
-        });
+        res.status(201).send({ msg: vote === 'up' ? 'Upvote!' : 'Downvote!' });
       })
       .catch(next);
   } else {
