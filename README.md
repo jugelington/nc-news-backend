@@ -32,14 +32,14 @@ code .
 ```
 
 3. Open the terminal in visual studio
-4. Install mongoose so our server can interact with the database
+4. Install express and mongoose so our server can interact with the database
 
 ```bash
+npm i express
 npm i mongoose
 ```
 
-5. Create config folder
-6. Inside the config folder, create a file called index.js which should look like:
+5. Create config folder, and inside it, create a file called index.js which should look like:
 
 ```js
 const ENV = process.env.NODE_ENV || 'development';
@@ -49,5 +49,27 @@ const config = {
   test: { DB_URL: 'mongodb://localhost:27017/nc-news-test' }
 };
 
-module.exports = config[ENV];
+module.exports = config[ENV].DB_URL;
+```
+
+6. At this point, to test our server is working, install nodemon and run it in bash:
+
+```bash
+npm i nodemon
+npm run dev
+```
+
+7. If it's working you should recieve something like this:
+
+```bash
+listening on port 9090...
+Connected to mongodb://localhost:27017/nc-news-dev
+```
+
+### Step 3 - Seeding the database
+
+1. Seed your database!
+
+```bash
+node ./seed/seed.dev.js
 ```
