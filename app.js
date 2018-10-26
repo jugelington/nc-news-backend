@@ -1,7 +1,16 @@
 const mongoose = require('mongoose');
-const { DB_URL } = require('./config') || process.env.MONGODB_URI;
+
 const express = require('express');
 const app = express();
+// let DB_URL;
+// if (process.env.NODE_ENV !== 'production')
+//    DB_URL  = require('./config');
+// } catch {
+//    DB_URL = process.env.MONGODB_URI;
+// }
+
+const { DB_URL } =
+  process.env.NODE_ENV !== 'production' ? require('./config') : process.env;
 
 const { apiRouter } = require('./routers/api.js');
 
