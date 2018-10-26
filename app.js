@@ -2,17 +2,7 @@ const mongoose = require('mongoose');
 
 const express = require('express');
 const app = express();
-// let DB_URL;
-// if (process.env.NODE_ENV !== 'production')
-//    DB_URL  = require('./config');
-// } catch {
-//    DB_URL = process.env.MONGODB_URI;
-// }
-
-const { DB_URL } =
-  process.env.NODE_ENV !== 'production'
-    ? require('./config')
-    : (DB_URL = process.env.MONGODB_URI);
+const { DB_URL } = require('./config');
 
 const { apiRouter } = require('./routers/api.js');
 
@@ -23,7 +13,7 @@ app.set('view engine', 'ejs');
 
 mongoose
   .connect(
-    DB_URL,
+    DB_URL || process.env.MONGODB_URI,
     { useNewUrlParser: true }
   )
   .then(() => {
