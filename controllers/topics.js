@@ -10,17 +10,13 @@ exports.getAllTopics = (req, res, next) => {
 
 exports.getArticlesByTopic = (req, res, next) => {
   const { topic_slug } = req.params;
-  Topic.find({ slug: topic_slug }) // I feel like this step shouldn't be necessary, I can probably refactor to get rid of it
-    .then(topics => {
-      if (topics.length === 0) {
-        return Promise.reject({ status: 404 });
-      }
-    })
-    .then(() => {
-      return Article.find({ belongs_to: topic_slug });
-    })
 
-    .then(articles => res.send(articles))
+  Article.find({ belongs_to: topic_slug })
+    .then(articles => {
+      return articles.length === 0
+        ? Promise.reject({ status: 404 })
+        : res.send(articles);
+    })
     .catch(next);
 };
 

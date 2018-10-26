@@ -247,7 +247,7 @@ describe('/api', () => {
           .expect(400)
           .then(res => {
             expect(res.body).to.haveOwnProperty('msg');
-            expect(res.body.msg).to.equal('Votes must be "up" or "down"!');
+            expect(res.body.msg).to.equal('400 Bad Request');
           });
       });
       it('PATCH /api/comments/:comment_id tells you if the comment does not exist', () => {

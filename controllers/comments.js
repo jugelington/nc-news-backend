@@ -15,10 +15,7 @@ exports.patchCommentVotes = (req, res, next) => {
       })
       .catch(next);
   } else {
-    res
-      .status(400)
-      .send({ msg: 'Votes must be "up" or "down"!' })
-      .catch(next);
+    next({ status: 400 });
   }
 };
 
