@@ -2,6 +2,10 @@
 
 ### Background
 
+This repo allows you to create an NC News server in express using mongoose, and database in Mongo; a working version of it is hosted at:
+
+https://sheltered-sands-58798.herokuapp.com/
+
 ### Step 1 - Cloning the repository
 
 1. Git clone this repository - If you're on github, click on the "Clone or download" button, and copy the URL that appears.
@@ -52,24 +56,54 @@ const config = {
 module.exports = config[ENV].DB_URL;
 ```
 
-6. At this point, to test our server is working, install nodemon and run it in bash:
+### Step 3 - MLab
+
+1. If you haven't already, sign up for MLabs!
+2. Create a new database
+3. Create a new user for that database; you'll need this information in the next step
+
+### Step 4 - Heroku
+
+1. If you haven't already, sign up for Heroku!
+2. Install the heroku CLI
 
 ```bash
-npm i nodemon
-npm run dev
+npm install -g heroku
 ```
 
-7. If it's working you should recieve something like this:
+3. Log into the heroku CLI
 
 ```bash
-listening on port 9090...
-Connected to mongodb://localhost:27017/nc-news-dev
+heroku login
 ```
 
-### Step 3 - Seeding the database
-
-1. Seed your database!
+4. Create your heroku project
 
 ```bash
-node ./seed/seed.dev.js
+heroku create <your project name>
 ```
+
+5. Push your repo to heroku
+
+```bash
+git push heroku master
+```
+
+6. Setup some variables heroku will need:
+
+```bash
+heroku config:set NODE_ENV=production
+heroku config:set MONGODB_URI=mongodb://<username>:<password>@ds141783.mlab.com:41783/<database>
+```
+
+### Step 5 - Seed
+
+1. Now you should just need to seed your database!
+
+```bash
+NODE_ENV=production node <path-to-file-that-runs-your-seed>
+```
+
+### Step 6 - Relax!
+
+Hopefully it's all working now!
