@@ -1,3 +1,5 @@
+const { Comment } = require('../models');
+
 exports.generateRefs = (rawData, docs) => {
   return rawData.reduce((acc, data, i) => {
     acc[data.username] = docs[i]._id;
@@ -42,4 +44,13 @@ exports.formatComment = (body, article_id) => {
   body.votes = 0;
   body.created_at = postedAt.toISOString();
   return body;
+};
+
+exports.countComments = article => {
+  return Comment.countDocuments({ belongs_to: article._id }).then(
+    comment_count => {
+      article.comment_count = comment_count;
+      return article;
+    }
+  );
 };

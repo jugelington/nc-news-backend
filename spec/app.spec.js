@@ -5,7 +5,7 @@ const seedDB = require('../seed/seed');
 const mongoose = require('mongoose');
 const { expect } = require('chai');
 
-const { Article, Comment, Topic, User } = require('../models');
+const { Article, Comment } = require('../models');
 const { articles, comments, topics, users } = require('../seed/testData');
 const {
   newValidArticle,

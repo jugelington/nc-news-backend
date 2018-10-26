@@ -1,21 +1,14 @@
 const { Article, Comment } = require('../models');
-const { formatComment } = require('../utils');
+const { formatComment, countComments } = require('../utils');
 
 exports.getAllArticles = (req, res, next) => {
   Article.find()
     .lean()
     .populate('created_by')
     .then(articles => {
-      return Promise.all(
-        articles.map(article => {
-          return Comment.countDocuments({
-            belongs_to: article._id
-          }).then(comment_count => {
-            article.comment_count = comment_count;
-            return article;
-          });
-        })
-      ).then(formatted => res.send(formatted));
+      return Promise.all(articles.map(article => countComments(article))).then(
+        formatted => res.send(formatted)
+      );
     })
 
     .catch(next);
@@ -29,14 +22,10 @@ exports.getArticleById = (req, res, next) => {
       if (!article) {
         return Promise.reject({ status: 404 });
       } else {
-        return Promise.all([
-          article,
-          Comment.countDocuments({ belongs_to: article_id })
-        ]);
+        return countComments(article);
       }
     })
-    .then(([article, comment_count]) => {
-      article._doc.comment_count = comment_count;
+    .then(article => {
       res.send(article);
     })
     .catch(next);
