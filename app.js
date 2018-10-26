@@ -12,7 +12,7 @@ const app = express();
 const { DB_URL } =
   process.env.NODE_ENV !== 'production'
     ? require('./config')
-    : process.env.MONGODB_URI;
+    : (DB_URL = process.env.MONGODB_URI);
 
 const { apiRouter } = require('./routers/api.js');
 
