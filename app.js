@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const express = require('express');
 const app = express();
-const { DB_URL } = require('./config');
+const { DB_URL } = require('./config') || null;
 
 const { apiRouter } = require('./routers/api.js');
 
