@@ -4,7 +4,7 @@ exports.patchCommentVotes = (req, res, next) => {
   const { comment_id } = req.params;
   const { vote } = req.query;
   if (vote === 'up') {
-    Comment.findByIdAndUpdate(comment_id, { $inc: { votes: 1 } })
+    Comment.findOneAndUpdate({ _id: comment_id }, { $inc: { votes: 1 } })
       .then(() => {
         res.status(201).send({
           msg: 'Upvote!'
@@ -12,7 +12,7 @@ exports.patchCommentVotes = (req, res, next) => {
       })
       .catch(next);
   } else if (vote === 'down') {
-    Comment.findByIdAndUpdate(comment_id, { $inc: { votes: -1 } })
+    Comment.findOneAndUpdate({ _id: comment_id }, { $inc: { votes: -1 } })
       .then(() => {
         res.status(201).send({
           msg: 'Downvote!'

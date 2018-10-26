@@ -68,7 +68,7 @@ exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
   const { vote } = req.query;
   if (vote === 'up') {
-    Article.findByIdAndUpdate(article_id, { $inc: { votes: 1 } })
+    Article.findOneAndUpdate({ _id: article_id }, { $inc: { votes: 1 } })
       .then(article => {
         res.status(201).send({
           msg: 'Upvote!'
@@ -76,7 +76,7 @@ exports.patchArticleVotes = (req, res, next) => {
       })
       .catch(next);
   } else if (vote === 'down') {
-    Article.findByIdAndUpdate(article_id, { $inc: { votes: -1 } })
+    Article.findOneAndUpdate({ _id: article_id }, { $inc: { votes: -1 } })
       .then(article => {
         res.status(201).send({
           msg: 'Downvote!'
@@ -84,6 +84,6 @@ exports.patchArticleVotes = (req, res, next) => {
       })
       .catch(next);
   } else {
-    res.status(400).send({ msg: 'Votes must be "up" or "down"!' });
+    next({ status: 400 });
   }
 };

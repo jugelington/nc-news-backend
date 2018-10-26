@@ -6,11 +6,13 @@ const mongoose = require('mongoose');
 const { expect } = require('chai');
 
 const { Article, Comment, Topic, User } = require('../models');
-
-const articles = require('../seed/testData/articles.json');
-const comments = require('../seed/testData/comments.json');
-const topics = require('../seed/testData/topics.json');
-const users = require('../seed/testData/users.json');
+const { articles, comments, topics, users } = require('../seed/testData');
+const {
+  newValidArticle,
+  newInvalidArticle,
+  newValidComment,
+  newInvalidComment
+} = require('../seed/testData/testinputs');
 
 describe('/api', () => {
   let articleDocs, topicDocs, commentDocs, userDocs;
@@ -24,6 +26,10 @@ describe('/api', () => {
     });
   });
 
+  after(() => {
+    return mongoose.disconnect();
+  });
+
   describe('/topics', () => {
     it('GET / returns all topics', () => {
       return request
@@ -35,7 +41,7 @@ describe('/api', () => {
           expect(res.body[0]).to.haveOwnProperty('slug');
         });
     });
-    it('GET /api/topics/:topic_slug/articles', () => {
+    it('GET /api/topics/:topic_slug/articles works for an existing topic slug', () => {
       return request
         .get('/api/topics/mitch/articles')
         .expect(200)
@@ -49,22 +55,33 @@ describe('/api', () => {
           expect(res.body[0]).to.haveOwnProperty('votes');
         });
     });
-    it('POST /api/topics/:topic_slug/articles', () => {
-      const newArticle = {
-        title: 'Example title',
-        body: 'This is example text',
-        created_by: '5bd080de8bbc631964814e2f',
-        belongs_to: 'examples'
-      };
+    it('Get /api/topics/:topic_slug/articles handles non-existing topic slugs', () => {
+      return request
+        .get('/api/topics/stefano/articles')
+        .expect(404)
+        .then(res => {
+          expect(res.body.msg).to.equal('404 Not Found');
+        });
+    });
+    it('POST /api/topics/:topic_slug/articles works when given a valid article', () => {
       return request
         .post('/api/topics/example_topic/articles')
-        .send(newArticle)
+        .send(newValidArticle)
         .expect(201)
         .then(res => {
           expect(res.body.newArticle).to.haveOwnProperty('title');
           expect(res.body.newArticle.title).to.equal('Example title');
           expect(res.body.newArticle).to.haveOwnProperty('body');
           expect(res.body.newArticle.body).to.equal('This is example text');
+        });
+    });
+    it('POST /api/topics/:topic_slug/articles rejects invalid articles', () => {
+      return request
+        .post('/api/topics/example_topic/articles')
+        .send(newInvalidArticle)
+        .expect(400)
+        .then(res => {
+          expect(res.body.msg).to.equal('400 Bad Request');
         });
     });
     describe('/articles', () => {
@@ -93,7 +110,7 @@ describe('/api', () => {
             expect(res.body[0].votes).to.equal(0);
           });
       });
-      it('GET /api/articles/:article_id', () => {
+      it('GET /api/articles/:article_id can find an article that exists', () => {
         return request
           .get(`/api/articles/${articleDocs[0]._id}`)
           .expect(200)
@@ -104,7 +121,13 @@ describe('/api', () => {
             );
           });
       });
-      it('GET /api/articles/:article_id/comments', () => {
+      it('GET /api/articles/:article_id returns 404 when a non-existant article is requested', () => {
+        return request
+          .get(`/api/articles/thisisnotanarticleid`)
+          .expect(404)
+          .then(res => expect(res.body.msg).to.equal('404 Not Found'));
+      });
+      it('GET /api/articles/:article_id/comments works for real id', () => {
         return request
           .get(`/api/articles/${articleDocs[0]._id}/comments`)
           .expect(200)
@@ -114,20 +137,41 @@ describe('/api', () => {
             );
           });
       });
-      it('POST /api/articles/:article_id/comments', () => {
-        const newComment = {
-          body: 'This is my new comment',
-          created_by: '5bd080de8bbc631964814e2a'
-        };
-
+      it('GET /api/articles/:article_id/comments rejects incorrect ids', () => {
+        return request
+          .get(`/api/articles/thisIsClearlyNotAGenuineId/comments`)
+          .expect(404)
+          .then(res => {
+            expect(res.body.msg).to.equal('404 Not Found');
+          });
+      });
+      it('POST /api/articles/:article_id/comments works for a valid comment', () => {
         return request
           .post(`/api/articles/${articleDocs[0]._id}/comments`)
-          .send(newComment)
+          .send(newValidComment)
           .expect(201)
           .then(res => {
             expect(res.body.newComment).to.haveOwnProperty('body');
             expect(res.body.newComment.body).to.equal('This is my new comment');
             expect(res.body.newComment).to.haveOwnProperty('_id');
+          });
+      });
+      it('POST /api/articles/:article_id/comments rejects invalid comments', () => {
+        return request
+          .post(`/api/articles/${articleDocs[0]._id}/comments`)
+          .send(newInvalidComment)
+          .expect(400)
+          .then(res => {
+            expect(res.body.msg).to.equal('400 Bad Request');
+          });
+      });
+      it('POST /api/articles/:article_id/comments rejects comments with invalid article id', () => {
+        return request
+          .post(`/api/articles/notAnArticleId/comments`)
+          .send(newValidComment)
+          .expect(400)
+          .then(res => {
+            expect(res.body.msg).to.equal('400 Bad Request');
           });
       });
       it('PATCH /api/articles/:article_id works for upvotes', () => {
@@ -157,7 +201,18 @@ describe('/api', () => {
       it('PATCH /api/articles/:article_id rejects invalid inputs', () => {
         return request
           .patch(`/api/articles/${articleDocs[0]._id}?vote=i_refuse_to_vote`)
-          .expect(400);
+          .expect(400)
+          .then(res => {
+            expect(res.body.msg).to.equal('400 Bad Request');
+          });
+      });
+      it('PATCH /api/articles/:article_id tells you if it can`t find the article', () => {
+        return request
+          .patch(`/api/articles/thereIsNoSuchArticle?vote=up`)
+          .expect(404)
+          .then(res => {
+            expect(res.body.msg).to.equal('404 Not Found');
+          });
       });
     });
 
@@ -195,7 +250,15 @@ describe('/api', () => {
             expect(res.body.msg).to.equal('Votes must be "up" or "down"!');
           });
       });
-      it('DELETE /api/comments/:comment_id', () => {
+      it('PATCH /api/comments/:comment_id tells you if the comment does not exist', () => {
+        return request
+          .patch('/api/comments/theCommentThatDoesNotExist?vote=up')
+          .expect(404)
+          .then(res => {
+            expect(res.body.msg).to.equal('404 Not Found');
+          });
+      });
+      it('DELETE /api/comments/:comment_id works for a comment that exists', () => {
         return request
           .delete(`/api/comments/${commentDocs[0]._id}`)
           .expect(200)
@@ -206,10 +269,14 @@ describe('/api', () => {
             });
           });
       });
+      it('DELETE /api/comments/:comment_id tells if you the comment does not exist', () => {
+        return request
+          .delete('/api/comments/iDoNotExist')
+          .expect(404)
+          .then(res => {
+            expect(res.body.msg).to.equal('404 Not Found');
+          });
+      });
     });
-  });
-
-  after(() => {
-    return mongoose.disconnect();
   });
 });

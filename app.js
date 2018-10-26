@@ -27,10 +27,15 @@ app.use('/*', (req, res) => {
 
 app.use((err, req, res, next) => {
   if (err.name === 'CastError' || err.status === 404) {
-    return res.status(404).send({ msg: 'ID not found' });
-  }
+    return res.status(404).send({ msg: '404 Not Found' });
+  } else next(err);
 });
 
+app.use((err, req, res, next) => {
+  if (err.status === 400 || err.name === 'ValidationError') {
+    return res.status(400).send({ msg: '400 Bad Request' });
+  } else next(err);
+});
 app.use((err, req, res, next) => {
   return res.status(500).send({ message: 'Unknown Error!' });
 });

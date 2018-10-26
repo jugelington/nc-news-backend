@@ -1,10 +1,7 @@
 const seedDB = require('./seed');
 const mongoose = require('mongoose');
 const { DB_URL } = require('../config');
-const articles = require('./testData/articles.json');
-const comments = require('./testData/comments.json');
-const topics = require('./testData/topics.json');
-const users = require('./testData/users.json');
+const { articles, comments, topics, users } = require('./testData');
 
 mongoose
   .connect(
