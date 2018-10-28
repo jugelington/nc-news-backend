@@ -56,13 +56,21 @@ const config = {
 module.exports = config[ENV].DB_URL;
 ```
 
-### Step 3 - MLab
+### Step 4 - Testing!
+
+1. Run the tests provided to enture everything is working as intended:
+
+```bash
+npm t
+```
+
+### Step 4 - MLab
 
 1. If you haven't already, sign up for MLabs!
 2. Create a new database
-3. Create a new user for that database; you'll need this information in the next step
+3. Create a new user for the database by selecting the database in your MLabs dashboard, clicking on 'Users', then 'Add database user'
 
-### Step 4 - Heroku
+### Step 5 - Heroku
 
 1. If you haven't already, sign up for Heroku!
 2. Install the heroku CLI
@@ -89,7 +97,9 @@ heroku create <your project name>
 git push heroku master
 ```
 
-6. Setup some variables heroku will need:
+6. Heroku will take some time to process the app; once it is finished, it will give you the URL to the working version of the app.
+
+7. Setup some variables heroku will need (your MONGODB_URI information will be on the MLabs database you setup; the username and password are the ones you created for that database ):
 
 ```bash
 heroku config:set NODE_ENV=production
@@ -106,4 +116,4 @@ NODE_ENV=production node <path-to-file-that-runs-your-seed>
 
 ### Step 6 - Relax!
 
-Hopefully it's all working now!
+1. There's nothing more to do now! You are finished!
