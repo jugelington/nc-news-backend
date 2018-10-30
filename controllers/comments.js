@@ -3,20 +3,15 @@ const { Comment } = require('../models');
 exports.patchCommentVotes = (req, res, next) => {
   const { comment_id } = req.params;
   const { vote } = req.query;
-  if (vote === 'up' || vote === 'down') {
-    Comment.findOneAndUpdate(
-      { _id: comment_id },
-      { $inc: { votes: vote === 'up' ? 1 : -1 } }
-    )
-      .then(() => {
-        res.status(201).send({
-          msg: vote === 'up' ? 'Upvote!' : 'Downvote!'
-        });
-      })
-      .catch(next);
-  } else {
-    next({ status: 400 });
-  }
+  Comment.findOneAndUpdate(
+    { _id: comment_id },
+    { $inc: { votes: vote === 'up' ? 1 : votes === 'down' ? -1 : 0 } },
+    { new: true }
+  )
+    .then(comment => {
+      res.status(201).send(comment);
+    })
+    .catch(next);
 };
 
 exports.deleteComment = (req, res, next) => {

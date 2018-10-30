@@ -84,30 +84,28 @@ describe('/api', () => {
           expect(res.body.msg).to.equal('400 Bad Request');
         });
     });
-    describe('/articles', () => {
+    describe.only('/articles', () => {
       it('GET /api/articles', () => {
         return request
           .get('/api/articles')
           .expect(200)
           .then(res => {
-            expect(res.body.length).to.equal(4);
-            expect(res.body[0]).to.haveOwnProperty('title');
-            expect(res.body[0].title).to.equal(
+            expect(res.body.articles.length).to.equal(4);
+            expect(res.body.articles[0]).to.haveOwnProperty('title');
+            expect(res.body.articles[0].title).to.equal(
               'Living in the shadow of a great man'
             );
 
-            expect(res.body[0]).to.haveOwnProperty('body');
-            expect(res.body[0].body).to.equal(
+            expect(res.body.articles[0]).to.haveOwnProperty('body');
+            expect(res.body.articles[0].body).to.equal(
               'I find this existence challenging'
             );
-            expect(res.body[0]).to.haveOwnProperty('created_at');
-            expect(res.body[0].created_at).to.equal('2016-08-18T12:07:52.389Z');
-            expect(res.body[0]).to.haveOwnProperty('created_by');
-            expect(res.body[0].created_by).to.be.an('object');
-            expect(res.body[0]).to.haveOwnProperty('belongs_to');
-            expect(res.body[0].belongs_to).to.equal('mitch');
-            expect(res.body[0]).to.haveOwnProperty('votes');
-            expect(res.body[0].votes).to.equal(0);
+            expect(res.body.articles[0].created_at).to.equal(
+              '2016-08-18T12:07:52.389Z'
+            );
+            expect(res.body.articles[0].created_by).to.be.an('object');
+            expect(res.body.articles[0].belongs_to).to.equal('mitch');
+            expect(res.body.articles[0].votes).to.equal(0);
           });
       });
       it('GET /api/articles/:article_id can find an article that exists', () => {
@@ -121,11 +119,8 @@ describe('/api', () => {
             );
           });
       });
-      it('GET /api/articles/:article_id returns 404 when a non-existant article is requested', () => {
-        return request
-          .get(`/api/articles/thisisnotanarticleid`)
-          .expect(404)
-          .then(res => expect(res.body.msg).to.equal('404 Not Found'));
+      it('GET /api/articles/:article_id returns 400 when an invalid article id is requested', () => {
+        return request.get(`/api/articles/thisisnotanarticleid`).expect(400);
       });
       it('GET /api/articles/:article_id/comments works for real id', () => {
         return request
@@ -137,13 +132,10 @@ describe('/api', () => {
             );
           });
       });
-      it('GET /api/articles/:article_id/comments rejects incorrect ids', () => {
+      it('GET /api/articles/:article_id/comments rejects invalid ids', () => {
         return request
           .get(`/api/articles/thisIsClearlyNotAGenuineId/comments`)
-          .expect(404)
-          .then(res => {
-            expect(res.body.msg).to.equal('404 Not Found');
-          });
+          .expect(400);
       });
       it('POST /api/articles/:article_id/comments works for a valid comment', () => {
         return request
@@ -209,10 +201,7 @@ describe('/api', () => {
       it('PATCH /api/articles/:article_id tells you if it can`t find the article', () => {
         return request
           .patch(`/api/articles/thereIsNoSuchArticle?vote=up`)
-          .expect(404)
-          .then(res => {
-            expect(res.body.msg).to.equal('404 Not Found');
-          });
+          .expect(400);
       });
     });
 

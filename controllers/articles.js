@@ -7,10 +7,9 @@ exports.getAllArticles = (req, res, next) => {
     .populate('created_by')
     .then(articles => {
       return Promise.all(articles.map(article => countComments(article))).then(
-        formatted => res.send(formatted)
+        formatted => res.send({ articles: [...formatted] })
       );
     })
-
     .catch(next);
 };
 
@@ -57,16 +56,13 @@ exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
   const { vote } = req.query;
 
-  if (vote === 'up' || vote === 'down') {
-    Article.findOneAndUpdate(
-      { _id: article_id },
-      { $inc: { votes: vote === 'up' ? 1 : -1 } }
-    )
-      .then(article => {
-        res.status(201).send({ msg: vote === 'up' ? 'Upvote!' : 'Downvote!' });
-      })
-      .catch(next);
-  } else {
-    next({ status: 400 });
-  }
+  Article.findOneAndUpdate(
+    { _id: article_id },
+    { $inc: { votes: vote === 'up' ? 1 : vote === 'down' ? -1 : 0 } },
+    { new: true }
+  )
+    .then(article => {
+      res.status(201).send(article);
+    })
+    .catch(next);
 };
