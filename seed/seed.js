@@ -15,14 +15,11 @@ const seedDB = ({ articles, comments, topics, users }) => {
       return Promise.all([Topic.insertMany(topics), User.insertMany(users)]);
     })
     .then(([topicDocs, userDocs]) => {
-      // Formatting articles
       const userRefs = generateRefs(users, userDocs);
-      const slugRefs = generateSlugs(topics);
       const formattedArticles = formatArticles({
         articles,
         userRefs,
-        topics,
-        slugRefs
+        topics
       });
       return Promise.all([
         topicDocs,

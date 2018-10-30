@@ -11,13 +11,6 @@ exports.generateRefs = (rawData, docs) => {
   }, {});
 };
 
-exports.generateSlugs = topics => {
-  return topics.reduce((acc, data) => {
-    acc[data.slug] = data.title;
-    return acc;
-  }, {});
-};
-
 exports.formatArticles = ({ articles, userRefs, topics, slugRefs }) => {
   return articles.map(article => ({
     ...article,
