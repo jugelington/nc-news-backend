@@ -2,7 +2,11 @@ const { Comment } = require('../models');
 
 exports.generateRefs = (rawData, docs) => {
   return rawData.reduce((acc, data, i) => {
-    acc[data.username] = docs[i]._id;
+    if (data.title) {
+      acc[data.title] = docs[i]._id;
+    } else if (data.username) {
+      acc[data.username] = docs[i]._id;
+    }
     return acc;
   }, {});
 };
@@ -10,14 +14,6 @@ exports.generateRefs = (rawData, docs) => {
 exports.generateSlugs = topics => {
   return topics.reduce((acc, data) => {
     acc[data.slug] = data.title;
-    return acc;
-  }, {});
-};
-
-exports.generateArticleRefs = (articles, docs) => {
-  return articles.reduce((acc, data, i) => {
-    acc[data.title] = docs[i]._id;
-
     return acc;
   }, {});
 };

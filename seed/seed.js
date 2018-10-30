@@ -33,7 +33,7 @@ const seedDB = ({ articles, comments, topics, users }) => {
     })
     .then(([topicDocs, userDocs, articleDocs, userRefs]) => {
       // Formatting comments
-      const articleRefs = generateArticleRefs(articles, articleDocs);
+      const articleRefs = generateRefs(articles, articleDocs);
       const formattedComments = formatComments({
         comments,
         userRefs,
