@@ -5,7 +5,7 @@ exports.patchCommentVotes = (req, res, next) => {
   const { vote } = req.query;
   Comment.findOneAndUpdate(
     { _id: comment_id },
-    { $inc: { votes: vote === 'up' ? 1 : votes === 'down' ? -1 : 0 } },
+    { $inc: { votes: vote === 'up' ? 1 : vote === 'down' ? -1 : 0 } },
     { new: true }
   )
     .then(comment => {
@@ -18,7 +18,7 @@ exports.deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
   Comment.findByIdAndRemove(comment_id)
     .then(() => {
-      res.status(200).send({ msg: 'comment deleted!' });
+      res.status(204).send();
     })
     .catch(next);
 };

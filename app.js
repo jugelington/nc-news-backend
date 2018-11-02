@@ -44,6 +44,7 @@ app.use((err, req, res, next) => {
   } else next(err);
 });
 app.use((err, req, res, next) => {
+  console.log(err);
   return res.status(500).send({ message: 'Unknown Error!' });
 });
 module.exports = app;

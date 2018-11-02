@@ -84,7 +84,7 @@ describe('/api', () => {
           expect(res.body.msg).to.equal('400 Bad Request');
         });
     });
-    describe.only('/articles', () => {
+    describe('/articles', () => {
       it('GET /api/articles', () => {
         return request
           .get('/api/articles')
@@ -171,8 +171,16 @@ describe('/api', () => {
           .patch(`/api/articles/${articleDocs[0]._id}?vote=up`)
           .expect(201)
           .then(res => {
-            expect(res.body).to.haveOwnProperty('msg');
-            expect(res.body.msg).to.equal('Upvote!');
+            expect(res.body).to.have.keys([
+              '__v',
+              '_id',
+              'belongs_to',
+              'body',
+              'created_at',
+              'created_by',
+              'title',
+              'votes'
+            ]);
             Article.findById(`${articleDocs[0]._id}`).then(article => {
               expect(article.votes).to.equal(1);
             });
@@ -183,8 +191,16 @@ describe('/api', () => {
           .patch(`/api/articles/${articleDocs[0]._id}?vote=down`)
           .expect(201)
           .then(res => {
-            expect(res.body).to.haveOwnProperty('msg');
-            expect(res.body.msg).to.equal('Downvote!');
+            expect(res.body).to.have.keys([
+              '__v',
+              '_id',
+              'belongs_to',
+              'body',
+              'created_at',
+              'created_by',
+              'title',
+              'votes'
+            ]);
             Article.findById(`${articleDocs[0]._id}`).then(article => {
               expect(article.votes).to.equal(-1);
             });
@@ -193,12 +209,24 @@ describe('/api', () => {
       it('PATCH /api/articles/:article_id rejects invalid inputs', () => {
         return request
           .patch(`/api/articles/${articleDocs[0]._id}?vote=i_refuse_to_vote`)
-          .expect(400)
+          .expect(201)
           .then(res => {
-            expect(res.body.msg).to.equal('400 Bad Request');
+            expect(res.body).to.have.keys([
+              '__v',
+              '_id',
+              'belongs_to',
+              'body',
+              'created_at',
+              'created_by',
+              'title',
+              'votes'
+            ]);
+            Article.findById(`${articleDocs[0]._id}`).then(article => {
+              expect(article.votes).to.equal(0);
+            });
           });
       });
-      it('PATCH /api/articles/:article_id tells you if it can`t find the article', () => {
+      it('PATCH /api/articles/:article_id tells rejects invalid article ids', () => {
         return request
           .patch(`/api/articles/thereIsNoSuchArticle?vote=up`)
           .expect(400);
@@ -211,8 +239,15 @@ describe('/api', () => {
           .patch(`/api/comments/${commentDocs[0]._id}?vote=up`)
           .expect(201)
           .then(res => {
-            expect(res.body).to.haveOwnProperty('msg');
-            expect(res.body.msg).to.equal('Upvote!');
+            expect(res.body).to.have.keys([
+              '__v',
+              '_id',
+              'belongs_to',
+              'body',
+              'created_at',
+              'created_by',
+              'votes'
+            ]);
             Comment.findById(`${commentDocs[0]._id}`).then(comment => {
               expect(comment.votes).to.equal(8);
             });
@@ -223,48 +258,54 @@ describe('/api', () => {
           .patch(`/api/comments/${commentDocs[0]._id}?vote=down`)
           .expect(201)
           .then(res => {
-            expect(res.body).to.haveOwnProperty('msg');
-            expect(res.body.msg).to.equal('Downvote!');
+            expect(res.body).to.have.keys([
+              '__v',
+              '_id',
+              'belongs_to',
+              'body',
+              'created_at',
+              'created_by',
+              'votes'
+            ]);
             Comment.findById(`${commentDocs[0]._id}`).then(comment => {
               expect(comment.votes).to.equal(6);
             });
           });
       });
-      it('PATCH /api/comments/:comment_id rejects invalid inputs', () => {
+      it('PATCH /api/comments/:comment_id handles invalid queries', () => {
         return request
           .patch(`/api/comments/${commentDocs[0]._id}?vote=i_hate_democracy`)
-          .expect(400)
+          .expect(201)
           .then(res => {
-            expect(res.body).to.haveOwnProperty('msg');
-            expect(res.body.msg).to.equal('400 Bad Request');
+            expect(res.body).to.have.keys([
+              '__v',
+              '_id',
+              'belongs_to',
+              'body',
+              'created_at',
+              'created_by',
+              'votes'
+            ]);
           });
       });
-      it('PATCH /api/comments/:comment_id tells you if the comment does not exist', () => {
+      it('PATCH /api/comments/:comment_id returns 400 for invalid Ids', () => {
         return request
-          .patch('/api/comments/theCommentThatDoesNotExist?vote=up')
-          .expect(404)
-          .then(res => {
-            expect(res.body.msg).to.equal('404 Not Found');
-          });
+          .patch('/api/comments/thisisaninvalidid?vote=up')
+          .expect(400);
       });
       it('DELETE /api/comments/:comment_id works for a comment that exists', () => {
         return request
           .delete(`/api/comments/${commentDocs[0]._id}`)
-          .expect(200)
+          .expect(204)
           .then(res => {
-            expect(res.body.msg).to.equal('comment deleted!');
+            expect(res.body).to.eql({});
             Comment.find().then(comments => {
               expect(comments.length).to.equal(7);
             });
           });
       });
-      it('DELETE /api/comments/:comment_id tells if you the comment does not exist', () => {
-        return request
-          .delete('/api/comments/iDoNotExist')
-          .expect(404)
-          .then(res => {
-            expect(res.body.msg).to.equal('404 Not Found');
-          });
+      it('DELETE /api/comments/:comment_id rejects invalid ids', () => {
+        return request.delete('/api/comments/iDoNotExist').expect(400);
       });
     });
   });
