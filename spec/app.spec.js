@@ -113,29 +113,34 @@ describe('/api', () => {
           .get(`/api/articles/${articleDocs[0]._id}`)
           .expect(200)
           .then(res => {
-            expect(res.body).to.haveOwnProperty('title');
-            expect(res.body.title).to.equal(
-              'Living in the shadow of a great man'
-            );
+            expect(res.body.title).to.equal(articleDocs[0].title);
           });
       });
       it('GET /api/articles/:article_id returns 400 when an invalid article id is requested', () => {
         return request.get(`/api/articles/thisisnotanarticleid`).expect(400);
+      });
+      it('GET /api/articles/:article_id returns 404 when an valid article id is requested but not found', () => {
+        return request
+          .get(`/api/articles/5bd3332e7277997cd63f1b34`)
+          .expect(404);
       });
       it('GET /api/articles/:article_id/comments works for real id', () => {
         return request
           .get(`/api/articles/${articleDocs[0]._id}/comments`)
           .expect(200)
           .then(res => {
-            expect(res.body.comments[0].body).to.equal(
-              'Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — on you it works.'
-            );
+            expect(res.body.comments[0].body).to.equal(commentDocs[0].body); // Is this right? Should these 2 things always be equal?
           });
       });
       it('GET /api/articles/:article_id/comments rejects invalid ids', () => {
         return request
           .get(`/api/articles/thisIsClearlyNotAGenuineId/comments`)
           .expect(400);
+      });
+      it('GET /api/articles/:article_id/comments gives 404 for valid ids that are not found', () => {
+        return request
+          .get(`/api/articles/5bd2332e7277997dd63f1a28/comments`)
+          .expect(404);
       });
       it('POST /api/articles/:article_id/comments works for a valid comment', () => {
         return request
@@ -161,10 +166,13 @@ describe('/api', () => {
         return request
           .post(`/api/articles/notAnArticleId/comments`)
           .send(newValidComment)
-          .expect(400)
-          .then(res => {
-            expect(res.body.msg).to.equal('400 Bad Request');
-          });
+          .expect(400);
+      });
+      it('POST /api/articles/:article_id/comments rejects comments with valid article id that is not found', () => {
+        return request
+          .post(`/api/articles/5bd2332e7277997dd63f1a28/comments`)
+          .send(newValidComment)
+          .expect(404);
       });
       it('PATCH /api/articles/:article_id works for upvotes', () => {
         return request
@@ -182,7 +190,7 @@ describe('/api', () => {
               'votes'
             ]);
             Article.findById(`${articleDocs[0]._id}`).then(article => {
-              expect(article.votes).to.equal(1);
+              expect(article.votes).to.equal(articleDocs[0].votes + 1);
             });
           });
       });
@@ -202,7 +210,7 @@ describe('/api', () => {
               'votes'
             ]);
             Article.findById(`${articleDocs[0]._id}`).then(article => {
-              expect(article.votes).to.equal(-1);
+              expect(article.votes).to.equal(articleDocs[0].votes - 1);
             });
           });
       });
@@ -222,14 +230,19 @@ describe('/api', () => {
               'votes'
             ]);
             Article.findById(`${articleDocs[0]._id}`).then(article => {
-              expect(article.votes).to.equal(0);
+              expect(article.votes).to.equal(articleDocs[0].votes);
             });
           });
       });
-      it('PATCH /api/articles/:article_id tells rejects invalid article ids', () => {
+      it('PATCH /api/articles/:article_id returns 400 for invalid article ids', () => {
         return request
           .patch(`/api/articles/thereIsNoSuchArticle?vote=up`)
           .expect(400);
+      });
+      it('PATCH /api/articles/:article_id returns 404 for valid but non-existant article ids', () => {
+        return request
+          .patch(`/api/articles/5bd2332e7277997dd63f1a28?vote=up`)
+          .expect(404);
       });
     });
 
@@ -293,6 +306,11 @@ describe('/api', () => {
           .patch('/api/comments/thisisaninvalidid?vote=up')
           .expect(400);
       });
+      it('PATCH /api/comments/:comment_id returns 404 for valid but non-existant Ids', () => {
+        return request
+          .patch('/api/comments/5bd2332e7277997dd63f1a28?vote=up')
+          .expect(404);
+      });
       it('DELETE /api/comments/:comment_id works for a comment that exists', () => {
         return request
           .delete(`/api/comments/${commentDocs[0]._id}`)
@@ -304,8 +322,13 @@ describe('/api', () => {
             });
           });
       });
-      it('DELETE /api/comments/:comment_id rejects invalid ids', () => {
+      it('DELETE /api/comments/:comment_id returns 400 for invalid ids', () => {
         return request.delete('/api/comments/iDoNotExist').expect(400);
+      });
+      it('DELETE /api/comments/:comment_id returns 404 for valid but non-existant ids', () => {
+        return request
+          .delete('/api/comments/5bd2332e7277997dd63f1a28')
+          .expect(404);
       });
     });
   });

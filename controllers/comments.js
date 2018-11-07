@@ -9,6 +9,7 @@ exports.patchCommentVotes = (req, res, next) => {
     { new: true }
   )
     .then(comment => {
+      if (!comment) throw { status: 404 };
       res.status(201).send(comment);
     })
     .catch(next);
@@ -17,7 +18,8 @@ exports.patchCommentVotes = (req, res, next) => {
 exports.deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
   Comment.findByIdAndRemove(comment_id)
-    .then(() => {
+    .then(deletedComment => {
+      if (!deletedComment) throw { status: 404 };
       res.status(204).send();
     })
     .catch(next);

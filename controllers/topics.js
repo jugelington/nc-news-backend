@@ -22,7 +22,6 @@ exports.getArticlesByTopic = (req, res, next) => {
 
 exports.postArticle = (req, res, next) => {
   const newArticle = new Article(req.body);
-
   newArticle
     .save()
     .then(() => {
