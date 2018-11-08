@@ -1,5 +1,5 @@
 const { Article, Comment } = require('../models');
-const { formatComment, countComments } = require('../utils');
+const { formatComment, countComments, patchVotes } = require('../utils');
 
 exports.getAllArticles = (req, res, next) => {
   Article.find()
@@ -59,15 +59,5 @@ exports.postComment = (req, res, next) => {
 exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
   const { vote } = req.query;
-
-  Article.findOneAndUpdate(
-    { _id: article_id },
-    { $inc: { votes: vote === 'up' ? 1 : vote === 'down' ? -1 : 0 } },
-    { new: true }
-  )
-    .then(article => {
-      if (!article) throw { status: 404 };
-      res.status(201).send(article);
-    })
-    .catch(next);
+  return patchVotes('Article', article_id, vote, res, next);
 };
