@@ -59,5 +59,5 @@ exports.postComment = (req, res, next) => {
 exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
   const { vote } = req.query;
-  return patchVotes('Article', article_id, vote, res, next);
+  return patchVotes(Article, article_id, vote, res, next);
 };

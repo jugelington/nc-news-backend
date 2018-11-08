@@ -4,7 +4,7 @@ const { patchVotes } = require('../utils');
 exports.patchCommentVotes = (req, res, next) => {
   const { comment_id } = req.params;
   const { vote } = req.query;
-  return patchVotes('Comment', comment_id, vote, res, next);
+  return patchVotes(Comment, comment_id, vote, res, next);
 };
 
 exports.deleteComment = (req, res, next) => {
