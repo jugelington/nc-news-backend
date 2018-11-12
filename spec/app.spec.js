@@ -216,7 +216,7 @@ describe('/api', () => {
       });
       it('PATCH /api/articles/:article_id rejects invalid queries', () => {
         return request
-          .patch(`/api/articles/${articleDocs[0]._id}?vote=i_refuse_to_vote`)
+          .patch(`/api/articles/${articleDocs[0]._id}?vote=invalid`)
           .expect(200)
           .then(res => {
             expect(res.body).to.have.keys([
@@ -287,7 +287,7 @@ describe('/api', () => {
       });
       it('PATCH /api/comments/:comment_id handles invalid queries', () => {
         return request
-          .patch(`/api/comments/${commentDocs[0]._id}?vote=i_hate_democracy`)
+          .patch(`/api/comments/${commentDocs[0]._id}?vote=invalid`)
           .expect(200)
           .then(res => {
             expect(res.body).to.have.keys([
