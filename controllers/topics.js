@@ -12,6 +12,8 @@ exports.getArticlesByTopic = (req, res, next) => {
   const { topic_slug } = req.params;
 
   Article.find({ belongs_to: topic_slug })
+    .lean()
+    .populate('created_by')
     .then(articles => {
       return articles.length === 0
         ? Promise.reject({ status: 404 })
