@@ -1,4 +1,4 @@
-const { Comment, Article } = require('../models');
+const { Comment } = require('../models');
 
 exports.generateRefs = (rawData, docs) => {
   return rawData.reduce((acc, data, i) => {
