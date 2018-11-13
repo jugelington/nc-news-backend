@@ -1,4 +1,5 @@
 const { Article, Topic } = require('../models');
+const { countComments } = require('../utils');
 
 exports.getAllTopics = (req, res, next) => {
   Topic.find()
@@ -17,7 +18,9 @@ exports.getArticlesByTopic = (req, res, next) => {
     .then(articles => {
       return articles.length === 0
         ? Promise.reject({ status: 404 })
-        : res.send({ articles: [...articles] });
+        : Promise.all(articles.map(article => countComments(article))).then(
+            formatted => res.send({ articles: [...formatted] })
+          );
     })
     .catch(next);
 };
