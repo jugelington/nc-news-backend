@@ -17,7 +17,7 @@ exports.getArticlesByTopic = (req, res, next) => {
     .then(articles => {
       return articles.length === 0
         ? Promise.reject({ status: 404 })
-        : res.send(articles);
+        : res.send({ articles: { ...articles } });
     })
     .catch(next);
 };
