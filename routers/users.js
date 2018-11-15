@@ -6,6 +6,6 @@ const {
 } = require('../controllers/users');
 
 usersRouter.get('/:username', getUserByUsername);
-usersRouter.get('/:userId/comments', getArticlesByUserId);
+usersRouter.get('/:userId/articles', getArticlesByUserId);
 
 module.exports = { usersRouter };

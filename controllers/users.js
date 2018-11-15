@@ -10,7 +10,7 @@ exports.getUserByUsername = (req, res, next) => {
 exports.getArticlesByUserId = (req, res, next) => {
   const { userId } = req.params;
   Article.find({ created_by: userId }).then(articles => {
-    if (!article) throw { status: 404 };
+    if (!articles) throw { status: 404 };
     res.send({ articles });
   });
 };
