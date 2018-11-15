@@ -1,4 +1,5 @@
 const { User, Article, Comment } = require('../models');
+const { countComments } = require('../utils');
 
 exports.getUserByUsername = (req, res, next) => {
   const { username } = req.params;
@@ -11,8 +12,9 @@ exports.getArticlesByUserId = (req, res, next) => {
   const { userId } = req.params;
   Article.find({ created_by: userId })
     .then(articles => {
-      if (!articles) throw { status: 404 };
-      res.send(articles);
+      return Promise.all(articles.map(article => countComments(article))).then(
+        formatted => res.send({ articles: [...formatted] })
+      );
     })
     .catch(next);
 };
