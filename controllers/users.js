@@ -1,6 +1,12 @@
 const { User, Article, Comment } = require('../models');
 const { countComments } = require('../utils');
 
+exports.getAllUsers = (req, res, next) => {
+  User.find()
+    .then(users => res.send(users))
+    .catch(next);
+};
+
 exports.getUserByUsername = (req, res, next) => {
   const { username } = req.params;
   User.find({ username: username })
