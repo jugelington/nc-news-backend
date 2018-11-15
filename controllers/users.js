@@ -1,4 +1,4 @@
-const { User, Article } = require('../models');
+const { User, Article, Comment } = require('../models');
 
 exports.getUserByUsername = (req, res, next) => {
   const { username } = req.params;
@@ -12,5 +12,13 @@ exports.getArticlesByUserId = (req, res, next) => {
   Article.find({ created_by: userId }).then(articles => {
     if (!articles) throw { status: 404 };
     res.send({ articles });
+  });
+};
+
+exports.getCommentsByUserId = (req, res, next) => {
+  const { userId } = req.params;
+  Comment.find({ created_by: userId }).then(comments => {
+    if (!comments) throw { status: 404 };
+    res.send({ comments });
   });
 };
