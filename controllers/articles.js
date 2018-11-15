@@ -61,3 +61,13 @@ exports.patchArticleVotes = (req, res, next) => {
   const { vote } = req.query;
   return patchVotes(Article, article_id, vote, res, next);
 };
+
+exports.deleteArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  Article.findByIdAndRemove(article_id)
+    .then(deletedArticle => {
+      if (!deletedArticle) throw { status: 404 };
+      res.status(204).send();
+    })
+    .catch(next);
+};
