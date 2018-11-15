@@ -11,6 +11,7 @@ exports.getUserByUsername = (req, res, next) => {
 exports.getArticlesByUserId = (req, res, next) => {
   const { userId } = req.params;
   Article.find({ created_by: userId })
+    .lean()
     .then(articles => {
       return Promise.all(articles.map(article => countComments(article))).then(
         formatted => res.send({ articles: [...formatted] })
