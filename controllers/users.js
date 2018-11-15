@@ -9,16 +9,21 @@ exports.getUserByUsername = (req, res, next) => {
 
 exports.getArticlesByUserId = (req, res, next) => {
   const { userId } = req.params;
-  Article.find({ created_by: userId }).then(articles => {
-    if (!articles) throw { status: 404 };
-    res.send({ articles });
-  });
+  Article.find({ created_by: userId })
+    .then(articles => {
+      if (!articles) throw { status: 404 };
+      res.send(articles);
+    })
+    .catch(next);
 };
 
 exports.getCommentsByUserId = (req, res, next) => {
   const { userId } = req.params;
-  Comment.find({ created_by: userId }).then(comments => {
-    if (!comments) throw { status: 404 };
-    res.send({ comments });
-  });
+  Comment.find({ created_by: userId })
+    .populate('belongs_to')
+    .then(comments => {
+      if (!comments) throw { status: 404 };
+      res.send(comments);
+    })
+    .catch(next);
 };
