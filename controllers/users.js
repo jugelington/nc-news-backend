@@ -10,7 +10,10 @@ exports.getAllUsers = (req, res, next) => {
 exports.getUserByUsername = (req, res, next) => {
   const { username } = req.params;
   User.find({ username: username })
-    .then(user => res.send(...user))
+    .then(user => {
+      if (!user.length) throw { status: 404 };
+      res.send(...user);
+    })
     .catch(next);
 };
 
