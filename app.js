@@ -20,6 +20,9 @@ mongoose
   )
   .then(() => {
     console.log(`Connected to ${DB_URL}`);
+  })
+  .catch(err => {
+    console.log(err)
   });
 
 app.use('/api', apiRouter);
