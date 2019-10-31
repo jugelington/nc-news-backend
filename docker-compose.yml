@@ -8,13 +8,18 @@ services:
       - type: volume
         source: nc_mongo_data
         target: /data/db
+  nc_mongo_seed:
+      build: ./seed
+      links: 
+        - nc_mongo
   nc_news_backend:
     build: .
-    depends_on:
+    links:
       - nc_mongo
     ports:
       - "9090:9090"
     environment:
       - MONGODB_URI=mongodb://nc_mongo:27017/
+    
 volumes:
   nc_mongo_data:
